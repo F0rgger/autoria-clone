@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/autoria
+      - SPRING_DATASOURCE_USERNAME=autoria
+      - SPRING_DATASOURCE_PASSWORD=autoria
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - PRIVATBANK_API_URL=https://api.privatbank.ua/p24api/pubinfo
+      - GOOGLE_CLOUD_NLP_API_KEY=${GOOGLE_CLOUD_NLP_API_KEY}
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=autoria
+      - POSTGRES_USER=autoria
+      - POSTGRES_PASSWORD=autoria
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/autoria_clone
+    username: postgres
+    password: mysecurepassword123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: maxforger@gmail.com}
+    password: tzdj knmx mhin pzex
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  cache:
+    cache-names: exchangeRates
+    caffeine:
+      spec: expireAfterWrite=24h
+privatbank:
+  api:
+    url: ${PRIVATBANK_API_URL:https://api.privatbank.ua/p24api/pubinfo}
+google:
+  cloud:
+    nlp:
+      api:
+        key: ${GOOGLE_CLOUD_NLP_API_KEY:your-google-api-key}
+        endpoint: https://language.googleapis.com
+server:
+  port: 8080
+jwt:
+  secret: 3zX9kPqW2mY8nR4vL6tJcF3hD5gB0aE2iU9oM7sN1rQ5yZ2xW8kPqV3mN7vL9tJcF4hD6gB1aE3iU0oM8sN2rQ==
+  expiration: 86400000
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.autoria.clone: DEBUG
