@@ -1,0 +1,44 @@
+package com.autoria.clone.domain.enums;
+
+public enum CarModel {
+    // BMW
+    X5, X3, M3, M5, SERIES_3, SERIES_5,
+    // DAEWOO
+    LANOS, NEXIA, MATIZ,
+    // AUDI
+    A4, A6, Q5, Q7,
+    // MERCEDES
+    E200, C200, S500, GLE,
+    // TOYOTA
+    CAMRY, COROLLA, RAV4, LAND_CRUISER,
+    // VOLKSWAGEN
+    GOLF, PASSAT, TIGUAN, JETTA,
+    // FORD
+    FOCUS, MONDEO, EXPLORER,
+    // HONDA
+    CIVIC, CRV, ACCORD,
+    // HYUNDAI
+    TUCSON, SONATA, ELANTRA,
+    // KIA
+    RIO, SORENTO, OPTIMA,
+    // VOLVO
+    XC60, XC90, S60,
+    // PEUGEOT
+    _308, _3008, _5008,
+    // RENAULT
+    MEGANE, DUSTER, LOGAN,
+    // SKODA
+    OCTAVIA, FABIA, KODIAQ,
+    // OPEL
+    ASTRA, INSIGNIA, CORSA,
+    // MAZDA
+    CX5, MX5, MAZDA3,
+    // SUBARU
+    FORESTER, OUTBACK, WRX,
+    // JEEP
+    CHEROKEE, WRANGLER,
+    // LAND_ROVER
+    DISCOVERY, RANGE_ROVER,
+    // PORSCHE
+    CAYENNE, PANAMERA, MACAN
+}

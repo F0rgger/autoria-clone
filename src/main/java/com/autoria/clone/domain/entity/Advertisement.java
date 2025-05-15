@@ -1,9 +1,12 @@
 package com.autoria.clone.domain.entity;
 
+import com.autoria.clone.domain.enums.CarBrand;
+import com.autoria.clone.domain.enums.CarModel;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 @Entity
@@ -16,10 +19,12 @@ public class Advertisement {
     private Long id;
 
     @Column(nullable = false)
-    private String carBrand;
+    @Enumerated(EnumType.STRING)
+    private CarBrand carBrand;
 
     @Column(nullable = false)
-    private String carModel;
+    @Enumerated(EnumType.STRING)
+    private CarModel carModel;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -30,6 +35,10 @@ public class Advertisement {
     @Column(nullable = false)
     private String city;
 
+
+    @Column(name = "active")
+    private boolean active = true;
+
     @Column(nullable = false)
     private String region;
 
@@ -37,7 +46,7 @@ public class Advertisement {
     private String description;
 
     @Column(nullable = false)
-    private Boolean active = true;
+    private String status = "PENDING";
 
     @Column(nullable = false)
     private Integer editAttempts = 0;
@@ -47,6 +56,15 @@ public class Advertisement {
     @MapKeyColumn(name = "currency")
     @Column(name = "price")
     private Map<String, BigDecimal> convertedPrices;
+
+    @Column
+    private int views;
+
+    @Column
+    private String exchangeRateSource = "PrivatBank";
+
+    @Column
+    private Date exchangeRateDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

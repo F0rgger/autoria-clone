@@ -14,9 +14,18 @@ public class ViewLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "advertisement_id", nullable = false)
-    private Long advertisementId;
+    @ManyToOne
+    @JoinColumn(name = "advertisement_id", nullable = false)
+    private Advertisement advertisement;
 
-    @Column(nullable = false)
+    @Column(name = "view_date", nullable = false)
+    private LocalDateTime viewDate;
+
+    @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
+
+    @PrePersist
+    protected void onCreate() {
+        this.timestamp = LocalDateTime.now();
+    }
 }

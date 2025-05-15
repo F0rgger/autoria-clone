@@ -1,6 +1,10 @@
 package com.autoria.clone.api;
 
+import com.autoria.clone.application.dto.UserDTO;
+import com.autoria.clone.application.mapper.EntityMapper;
+import com.autoria.clone.domain.entity.Role;
 import com.autoria.clone.domain.entity.User;
+import com.autoria.clone.domain.repository.RoleRepository;
 import com.autoria.clone.domain.repository.UserRepository;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,88 +13,185 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final Key jwtSigningKey;
     private final long jwtExpiration;
+    private final EntityMapper entityMapper;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
+    public AuthController(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
                           @Value("${jwt.secret}") String jwtSecret,
-                          @Value("${jwt.expiration}") long jwtExpiration) {
+                          @Value("${jwt.expiration}") long jwtExpiration,
+                          EntityMapper entityMapper) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtSigningKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
         this.jwtExpiration = jwtExpiration;
+        this.entityMapper = entityMapper;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        logger.info("Received registration request for email: {}", user.getEmail());
-
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            logger.warn("User with email {} already exists", user.getEmail());
+    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+        logger.info("Received registration request for email: {}", userDTO.getEmail());
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            logger.warn("User with email {} already exists", userDTO.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User with email " + user.getEmail() + " already exists");
+                    .body("User with email " + userDTO.getEmail() + " already exists");
         }
 
-        try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
-            logger.info("User registered successfully: {}", user.getEmail());
-            return ResponseEntity.ok("Пользователь зарегистрирован");
-        } catch (DataIntegrityViolationException e) {
-            logger.error("Data integrity violation: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User with email " + user.getEmail() + " already exists");
-        } catch (Exception e) {
-            logger.error("Unexpected error registering user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error registering user: " + e.getMessage());
+        User user = entityMapper.toUserEntity(userDTO);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setAdvertisementCount(0);
+
+        Role role;
+        if (userDTO.getEmail().toLowerCase().contains("admin")) {
+            role = roleRepository.findByName(Role.ADMIN)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setName(Role.ADMIN);
+                        newRole.setPermissions(Arrays.asList("MANAGE_ROLES", "MODERATE_ADVERTISEMENT"));
+                        return roleRepository.save(newRole);
+                    });
+        } else {
+            role = roleRepository.findByName(Role.BUYER)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setName(Role.BUYER);
+                        newRole.setPermissions(Arrays.asList("VIEW_ADS", "CONTACT_SELLER"));
+                        return roleRepository.save(newRole);
+                    });
         }
+        user.getRoles().add(role);
+
+        userRepository.save(user);
+        logger.info("User registered successfully: {}", user.getEmail());
+        return ResponseEntity.ok("Пользователь зарегистрирован");
     }
 
+
+
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User loginUser) {
-        logger.info("Received login request for email: {}", loginUser.getEmail());
-        User user = userRepository.findByEmail(loginUser.getEmail())
+    public ResponseEntity<String> login(@RequestBody UserDTO loginUserDTO) {
+        logger.info("Received login request for email: {}", loginUserDTO.getEmail());
+        User user = userRepository.findByEmail(loginUserDTO.getEmail())
                 .orElseThrow(() -> {
-                    logger.warn("User not found: {}", loginUser.getEmail());
+                    logger.warn("User not found: {}", loginUserDTO.getEmail());
                     return new RuntimeException("Пользователь не найден");
                 });
-        if (passwordEncoder.matches(loginUser.getPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(loginUserDTO.getPassword(), user.getPassword())) {
             try {
-                String token = Jwts.builder()
-                        .setSubject(user.getEmail())
-                        .setIssuedAt(new Date())
-                        .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                        .signWith(jwtSigningKey, SignatureAlgorithm.HS512)
-                        .compact();
+                String token = generateJwtToken(user);
                 logger.info("Login successful for user: {}", user.getEmail());
                 return ResponseEntity.ok(token);
             } catch (JwtException e) {
-                logger.error("JWT creation failed: {}", e.getMessage());
+                logger.error("JWT creation failed: {}", e.getMessage(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Failed to generate token: " + e.getMessage());
             }
         }
-        logger.warn("Invalid credentials for user: {}", loginUser.getEmail());
+        logger.warn("Invalid credentials for user: {}", loginUserDTO.getEmail());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Неверные учетные данные");
+    }
+
+    @PostMapping("/create-manager")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> createManager(@RequestBody UserDTO userDTO) {
+        // Проверяем, существует ли пользователь с таким email
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("User with email " + userDTO.getEmail() + " already exists");
+        }
+
+        // Создаём роль MANAGER, если её нет
+        Role managerRole = roleRepository.findByName(Role.MANAGER)
+                .orElseGet(() -> {
+                    Role newManagerRole = new Role();
+                    newManagerRole.setName("MANAGER");
+                    return roleRepository.save(newManagerRole);
+                });
+
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPremium(false);
+        user.setAdvertisementCount(0);
+        user.getRoles().add(managerRole);
+
+        userRepository.save(user);
+        return ResponseEntity.ok("Manager created successfully");
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()") // Достаточно для аутентифицированных пользователей
+    public ResponseEntity<String> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("Fetching current user: {}", userDetails.getUsername());
+        if (userDetails == null) {
+            logger.error("UserDetails is null");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername()));
+        return ResponseEntity.ok(String.valueOf(user.getId()));
+    }
+
+    @PostMapping("/upgrade")
+    @PreAuthorize("hasRole('BUYER')") // Требуем роль BUYER
+    public ResponseEntity<String> upgradeAccount(@RequestParam String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role sellerRole = roleRepository.findByName(Role.SELLER)
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setName(Role.SELLER);
+                    newRole.setPermissions(Arrays.asList("CREATE_ADVERTISEMENT", "EDIT_ADVERTISEMENT", "VIEW_ADVERTISEMENT_STATS"));
+                    return roleRepository.save(newRole);
+                });
+        user.getRoles().add(sellerRole);
+        user.setPremium(true);
+        userRepository.save(user);
+        return ResponseEntity.ok("Account upgraded to premium");
+    }
+
+    private String generateJwtToken(User user) {
+        String roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(","));
+        String permissions = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .collect(Collectors.joining(","));
+
+        logger.debug("Generating JWT for user: {}, roles: {}, permissions: {}", user.getEmail(), roles, permissions);
+
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .claim("roles", roles)
+                .claim("permissions", permissions)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(jwtSigningKey, SignatureAlgorithm.HS512)
+                .compact();
     }
 }

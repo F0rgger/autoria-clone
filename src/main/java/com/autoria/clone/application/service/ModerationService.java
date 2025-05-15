@@ -5,6 +5,8 @@ import com.autoria.clone.domain.repository.AdvertisementRepository;
 import com.autoria.clone.infrastructure.service.EmailService;
 import com.autoria.clone.infrastructure.service.ProfanityFilterService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ModerationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ModerationService.class);
 
     private final AdvertisementRepository advertisementRepository;
     private final ProfanityFilterService profanityFilterService;
@@ -27,30 +31,40 @@ public class ModerationService {
      */
     @Transactional
     public boolean checkAdvertisement(Long advertisementId) {
+        logger.debug("Checking advertisement with ID: {}", advertisementId);
+        if (advertisementId == null) {
+            throw new IllegalArgumentException("Advertisement ID must not be null");
+        }
+
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(() -> new IllegalArgumentException("Оголошення з ID " + advertisementId + " не знайдено"));
 
         boolean containsProfanity = profanityFilterService.containsProfanity(advertisement.getDescription());
+        logger.debug("Profanity check result for advertisement ID {}: {}", advertisementId, containsProfanity);
 
         if (!containsProfanity) {
-            advertisement.setActive(true);
+            advertisement.setStatus("ACTIVE");
             advertisement.setEditAttempts(0);
+            logger.debug("Advertisement ID {} passed moderation, status set to ACTIVE", advertisementId);
             advertisementRepository.save(advertisement);
             return true;
-        } else {
-            int attempts = advertisement.getEditAttempts() + 1;
-            advertisement.setEditAttempts(attempts);
-
-            if (attempts >= 3) {
-                advertisement.setActive(false);
-                advertisementRepository.save(advertisement);
-                notifyManager(advertisement);
-                return false;
-            }
-
-            advertisementRepository.save(advertisement);
-            return false;
         }
+
+        int attempts = advertisement.getEditAttempts() + 1;
+        advertisement.setEditAttempts(attempts);
+        logger.debug("Advertisement ID {} failed moderation, edit attempts: {}", advertisementId, attempts);
+
+        if (attempts >= 3) {
+            advertisement.setStatus("INACTIVE");
+            logger.debug("Advertisement ID {} set to INACTIVE due to max edit attempts", advertisementId);
+            notifyManager(advertisement);
+        } else {
+            advertisement.setStatus("PENDING");
+            logger.debug("Advertisement ID {} set to PENDING", advertisementId);
+        }
+
+        advertisementRepository.save(advertisement);
+        return false;
     }
 
     /**
@@ -64,5 +78,6 @@ public class ModerationService {
                 "<h2>Оголошення не пройшло перевірку</h2><p>ID: %d<br>Опис: %s<br>Кількість спроб редагування: %d</p>",
                 advertisement.getId(), advertisement.getDescription(), advertisement.getEditAttempts());
         emailService.sendEmail("manager@autoria.clone", subject, body);
+        logger.debug("Notified manager about advertisement ID: {}", advertisement.getId());
     }
 }

@@ -1,55 +1,50 @@
 package com.autoria.clone.application.service;
 
+
+
 import com.autoria.clone.domain.entity.Role;
 import com.autoria.clone.domain.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Сервіс для управління ролями.
- */
 @Service
-@RequiredArgsConstructor
 public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    /**
-     * Створює нову роль.
-     *
-     * @param role Роль
-     * @return Створена роль
-     */
-    @Transactional
-    public Role createRole(Role role) {
-        return roleRepository.save(role);
+    public RoleService(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
     }
 
-    /**
-     * Ініціалізує базові ролі та дозволи.
-     */
     @Transactional
     public void initializeRolesAndPermissions() {
-        List<String> roles = Arrays.asList("BUYER", "SELLER", "MANAGER", "ADMIN", "DEALERSHIP");
-        List<String> permissions = Arrays.asList(
-                "CREATE_ADVERTISEMENT", "VIEW_ANALYTICS", "MODERATE_ADVERTISEMENT",
-                "MANAGE_ROLES", "MANAGE_DEALERSHIP_ADS");
+        List<String> roleNames = Arrays.asList(
+                Role.BUYER, Role.SELLER, Role.MANAGER, Role.ADMIN,
+                Role.DEALERSHIP, Role.SALES, Role.MECHANIC
+        );
 
-        roles.forEach(roleName -> {
-            Role role = new Role();
-            role.setName(roleName);
-            roleRepository.save(role);
-        });
+        for (String roleName : roleNames) {
+            // Проверяем, существует ли роль
+            if (roleRepository.findByName(roleName).isEmpty()) {
+                Role role = new Role();
+                role.setName(roleName);
 
-        // Приклад прив’язки дозволів
-        Role sellerRole = roleRepository.findByName("SELLER").orElseThrow();
-        sellerRole.getPermissions().addAll(Arrays.asList("CREATE_ADVERTISEMENT", "VIEW_ANALYTICS"));
-        Role dealershipRole = roleRepository.findByName("DEALERSHIP").orElseThrow();
-        dealershipRole.getPermissions().add("MANAGE_DEALERSHIP_ADS");
-        roleRepository.saveAll(Arrays.asList(sellerRole, dealershipRole));
+                // Назначаем разрешения в зависимости от роли
+                switch (roleName) {
+                    case Role.BUYER -> role.setPermissions(Arrays.asList("VIEW_ADS", "CONTACT_SELLER"));
+                    case Role.SELLER -> role.setPermissions(Arrays.asList("CREATE_ADS", "EDIT_ADS"));
+                    case Role.MANAGER -> role.setPermissions(Arrays.asList("MODERATE_ADS"));
+                    case Role.ADMIN -> role.setPermissions(Arrays.asList("MANAGE_ROLES", "MODERATE_ADVERTISEMENT"));
+                    case Role.DEALERSHIP -> role.setPermissions(Arrays.asList("MANAGE_STAFF"));
+                    case Role.SALES -> role.setPermissions(Arrays.asList("SELL_CARS"));
+                    case Role.MECHANIC -> role.setPermissions(Arrays.asList("SERVICE_CARS"));
+                }
+
+                roleRepository.save(role);
+            }
+        }
     }
 }

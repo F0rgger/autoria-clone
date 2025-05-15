@@ -1,0 +1,6 @@
+package com.autoria.clone.domain.enums;
+
+public enum CarBrand {
+    BMW, DAEWOO, AUDI, MERCEDES, TOYOTA, VOLKSWAGEN, FORD, HONDA, HYUNDAI, KIA,
+    VOLVO, PEUGEOT, RENAULT, SKODA, OPEL, MAZDA, SUBARU, JEEP, LAND_ROVER, PORSCHE
+}

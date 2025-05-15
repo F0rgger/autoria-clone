@@ -1,30 +1,45 @@
 version: '3.8'
 services:
-  api:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/autoria
-      - SPRING_DATASOURCE_USERNAME=autoria
-      - SPRING_DATASOURCE_PASSWORD=autoria
-      - SMTP_USERNAME=${SMTP_USERNAME}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - PRIVATBANK_API_URL=https://api.privatbank.ua/p24api/pubinfo
-      - GOOGLE_CLOUD_NLP_API_KEY=${GOOGLE_CLOUD_NLP_API_KEY}
     depends_on:
       - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/autoria
+      - SPRING_DATASOURCE_USERNAME=your_username
+      - SPRING_DATASOURCE_PASSWORD=your_password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXPIRATION=3600000
+      - SPRING_MAIL_HOST=smtp.gmail.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=your_email@gmail.com
+      - SPRING_MAIL_PASSWORD=your_app_password
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
+      - PRIVATBANK_API_URL=https://api.privatbank.ua/p24api/pubinfo
+    networks:
+      - app-network
+
   db:
     image: postgres:15
     environment:
       - POSTGRES_DB=autoria
-      - POSTGRES_USER=autoria
-      - POSTGRES_PASSWORD=autoria
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=your_username
+      - POSTGRES_PASSWORD=your_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
 volumes:
-  postgres_data:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge

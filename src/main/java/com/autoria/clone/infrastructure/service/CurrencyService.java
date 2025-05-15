@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,9 +12,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Сервис для получения курсов валют через API ПриватБанка.
- */
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
@@ -23,13 +21,8 @@ public class CurrencyService {
     @Value("${privatbank.api.url}")
     private String privatBankApiUrl;
 
-    /**
-     * Получает текущие курсы валют с кэшированием (обновление раз в день).
-     *
-     * @param currencies Список валют (например, USD, EUR)
-     * @return Карта с курсами валют (валюта -> курс к UAH)
-     */
     @Cacheable(value = "exchangeRates", sync = true)
+    @Scheduled(fixedRate = 86400000)
     public Map<String, BigDecimal> getExchangeRates(String... currencies) {
         String url = privatBankApiUrl + "?json&exchange&coursid=5";
         PrivatBankExchangeRateResponse[] response = restTemplate.getForObject(url, PrivatBankExchangeRateResponse[].class);
@@ -48,9 +41,6 @@ public class CurrencyService {
     }
 }
 
-/**
- * DTO для ответа от API ПриватБанка.
- */
 @Data
 class PrivatBankExchangeRateResponse {
     private String ccy;
