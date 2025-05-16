@@ -10,7 +10,7 @@ import java.util.List;
 public class UserDTO {
     private Long id;
     private String email;
-    private String password; // Для входящих запросов (регистрация/логин)
+    private String password;
     private boolean premium;
     private int advertisementCount;
     private List<String> roles;

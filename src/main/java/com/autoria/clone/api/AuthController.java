@@ -144,7 +144,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()") // Достаточно для аутентифицированных пользователей
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching current user: {}", userDetails.getUsername());
         if (userDetails == null) {
@@ -157,15 +157,15 @@ public class AuthController {
     }
 
     @PostMapping("/upgrade")
-    @PreAuthorize("hasRole('BUYER')") // Требуем роль BUYER
+    @PreAuthorize("hasRole('BUYER')")
     public ResponseEntity<String> upgradeAccount(@RequestParam String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         Role sellerRole = roleRepository.findByName(Role.SELLER)
                 .orElseGet(() -> {
                     Role newRole = new Role();
                     newRole.setName(Role.SELLER);
+                    // Обновляем разрешения
                     newRole.setPermissions(Arrays.asList("CREATE_ADVERTISEMENT", "EDIT_ADVERTISEMENT", "VIEW_ADVERTISEMENT_STATS"));
                     return roleRepository.save(newRole);
                 });

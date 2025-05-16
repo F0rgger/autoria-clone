@@ -91,25 +91,25 @@ public class AdvertisementController {
         logger.debug("Searching advertisements with params: carBrand={}, carModel={}, minPrice={}, maxPrice={}, city={}, region={}, currency={}",
                 carBrand, carModel, minPrice, maxPrice, city, region, currency);
 
-        // Преобразование carBrand
+
         CarBrand carBrandEnum = null;
         if (carBrand != null && !carBrand.isEmpty()) {
             try {
                 carBrandEnum = CarBrand.valueOf(carBrand.toUpperCase());
             } catch (IllegalArgumentException e) {
                 logger.warn("Invalid carBrand value: {}. Valid values are: {}", carBrand, Arrays.toString(CarBrand.values()));
-                return ResponseEntity.badRequest().body(null); // Возвращаем 400 с понятным сообщением
+                return ResponseEntity.badRequest().body(null);
             }
         }
 
-        // Преобразование carModel
+
         CarModel carModelEnum = null;
         if (carModel != null && !carModel.isEmpty()) {
             try {
                 carModelEnum = CarModel.valueOf(carModel.toUpperCase());
             } catch (IllegalArgumentException e) {
                 logger.warn("Invalid carModel value: {}. Valid values are: {}", carModel, Arrays.toString(CarModel.values()));
-                return ResponseEntity.badRequest().body(null); // Возвращаем 400 с понятным сообщением
+                return ResponseEntity.badRequest().body(null);
             }
         }
 
@@ -136,8 +136,8 @@ public class AdvertisementController {
     @PreAuthorize("hasAuthority('VIEW_ADVERTISEMENT_STATS')")
     public ResponseEntity<Map<String, Object>> getAdvertisementStats(
             @PathVariable Long id,
-            @RequestAttribute("user") UserDetails userDetails) { // Изменено на UserDetails
-        // Загружаем сущность User из базы данных
+            @RequestAttribute("user") UserDetails userDetails) {
+
         com.autoria.clone.domain.entity.User user = advertisementService.loadUserEntity(userDetails.getUsername());
         Map<String, Object> stats = advertisementService.getAdvertisementStats(id, user);
         return ResponseEntity.ok(stats);

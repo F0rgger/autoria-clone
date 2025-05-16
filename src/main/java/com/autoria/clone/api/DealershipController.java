@@ -27,10 +27,9 @@ public class DealershipController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<DealershipDTO> createDealership(
-            @Valid @RequestBody DealershipDTO dealershipDTO,
-            @RequestParam Long adminId) {
+    public ResponseEntity<DealershipDTO> createDealership(@Valid @RequestBody DealershipDTO dealershipDTO) {
         Dealership dealership = entityMapper.toDealershipEntity(dealershipDTO);
+        Long adminId = dealershipDTO.getAdminId(); // 👈 вытаскиваем из тела
         Dealership created = dealershipService.createDealership(dealership, adminId);
 
         List<User> users = dealershipDTO.getUserIds().stream()
@@ -38,13 +37,15 @@ public class DealershipController {
                 .map(userId -> userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId)))
                 .collect(Collectors.toList());
+
         if (created.getUsers() == null) {
-            created.setUsers(new ArrayList<>()); // Безопасная инициализация
+            created.setUsers(new ArrayList<>());
         }
-        created.getUsers().addAll(users); // Используем addAll для добавления списка
+        created.getUsers().addAll(users);
 
         return ResponseEntity.ok(entityMapper.toDealershipDTO(created));
     }
+
 
     @PostMapping("/{id}/assign-user")
     @PreAuthorize("hasRole('ADMIN')")

@@ -1,6 +1,6 @@
 package com.autoria.clone.application.service;
 
-import com.autoria.clone.api.AdvertisementController;
+
 import com.autoria.clone.domain.entity.Advertisement;
 import com.autoria.clone.domain.entity.User;
 import com.autoria.clone.domain.entity.ViewLog;
@@ -114,11 +114,11 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Объявление с ID " + id + " не найдено"));
 
-        // Увеличиваем счётчик просмотров
+
         advertisement.setViews(advertisement.getViews() + 1);
         advertisementRepository.save(advertisement);
 
-        // Логируем просмотр
+
         ViewLog viewLog = new ViewLog();
         viewLog.setAdvertisement(advertisement);
         viewLog.setViewDate(LocalDateTime.now());

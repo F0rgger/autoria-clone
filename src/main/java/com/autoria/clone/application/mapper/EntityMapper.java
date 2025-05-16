@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Component
 public class EntityMapper {
 
-    // Advertisement
+
     public AdvertisementDTO toAdvertisementDTO(Advertisement advertisement) {
         AdvertisementDTO dto = new AdvertisementDTO();
         dto.setId(advertisement.getId());
@@ -53,12 +53,11 @@ public class EntityMapper {
         return advertisement;
     }
 
-    // User
+
     public UserDTO toUserDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
-        // Поле password не устанавливается для исходящих ответов
         dto.setPremium(user.isPremium());
         dto.setAdvertisementCount(user.getAdvertisementCount());
         dto.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
@@ -69,13 +68,13 @@ public class EntityMapper {
         User user = new User();
         user.setId(dto.getId());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // Пароль устанавливается только при регистрации/логине
+        user.setPassword(dto.getPassword());
         user.setPremium(dto.isPremium());
         user.setAdvertisementCount(dto.getAdvertisementCount());
         return user;
     }
 
-    // Dealership
+
     public DealershipDTO toDealershipDTO(Dealership dealership) {
         DealershipDTO dto = new DealershipDTO();
         dto.setId(dealership.getId());
@@ -94,7 +93,6 @@ public class EntityMapper {
         return dealership;
     }
 
-    // ViewLog
     public ViewLogDTO toViewLogDTO(ViewLog viewLog) {
         ViewLogDTO dto = new ViewLogDTO();
         dto.setId(viewLog.getId());

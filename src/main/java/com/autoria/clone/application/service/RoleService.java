@@ -27,12 +27,12 @@ public class RoleService {
         );
 
         for (String roleName : roleNames) {
-            // Проверяем, существует ли роль
+
             if (roleRepository.findByName(roleName).isEmpty()) {
                 Role role = new Role();
                 role.setName(roleName);
 
-                // Назначаем разрешения в зависимости от роли
+
                 switch (roleName) {
                     case Role.BUYER -> role.setPermissions(Arrays.asList("VIEW_ADS", "CONTACT_SELLER"));
                     case Role.SELLER -> role.setPermissions(Arrays.asList("CREATE_ADS", "EDIT_ADS"));

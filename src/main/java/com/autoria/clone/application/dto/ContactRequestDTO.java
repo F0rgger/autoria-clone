@@ -4,9 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
-/**
- * DTO для запиту на зв’язок з продавцем.
- */
+
 @Data
 public class ContactRequestDTO {
 

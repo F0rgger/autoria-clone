@@ -1,285 +1,488 @@
 {
   "info": {
-    "name": "AutoRia Clone API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "Autoria Clone API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "your-unique-id-here",
+    "description": "API collection for Autoria Clone application",
+    "version": "1.0.0"
   },
   "item": [
     {
-      "name": "Register User (Buyer)",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"email\":\"buyer@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/register"
-      },
-      "response": []
-    },
-    {
-      "name": "Login User (Buyer)",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"email\":\"buyer@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/login"
-      },
-      "response": [],
-      "event": [
+      "name": "Authentication",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "var token = pm.response.text();",
-              "pm.environment.set('buyer_jwt_token', token);",
-              "console.log('Buyer JWT Token:', token);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Register User (Admin)",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"email\":\"admin@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/register"
-      },
-      "response": []
-    },
-    {
-      "name": "Login User (Admin)",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"email\":\"admin@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/login"
-      },
-      "response": [],
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "var token = pm.response.text();",
-              "pm.environment.set('admin_jwt_token', token);",
-              "console.log('Admin JWT Token:', token);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Create Manager (Admin only)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
-        ],
-        "body": {"mode": "raw", "raw": "{\"email\":\"manager@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/create-manager"
-      },
-      "response": []
-    },
-
-    {
-      "name": "Upgrade to Premium",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
-        ],
-        "url": {
-          "raw": "http://localhost:8080/api/auth/upgrade?email=buyer@example.com",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "auth", "upgrade"],
-          "query": [{"key": "email", "value": "buyer@example.com"}]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login User (Buyer) After Upgrade",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {"mode": "raw", "raw": "{\"email\":\"buyer@example.com\",\"password\":\"password123\"}"},
-        "url": "http://localhost:8080/api/auth/login"
-      },
-      "response": [],
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "var token = pm.response.text();",
-              "pm.environment.set('buyer_jwt_token', token);",
-              "console.log('Updated Buyer JWT Token:', token);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Get Current User (Buyer)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
-        ],
-        "url": "http://localhost:8080/api/auth/me"
-      },
-      "response": [],
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "var userId = pm.response.text();",
-              "if (userId) {",
-              "    pm.environment.set('buyer_user_id', userId);",
-              "    console.log('Buyer User ID:', userId);",
-              "} else {",
-              "    console.error('No user ID received in Get Current User (Buyer)');",
-              "}"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Create Advertisement",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"userId\":{{buyer_user_id}},\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":35000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Good car\"}"
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@example.com\",\"password\":\"admin123\"}"
+            },
+            "url": "http://localhost:8080/api/auth/register"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "pm.expect(pm.response.text()).to.include('Пользователь зарегистрирован');",
+                  "console.log('Admin registration successful');"
+                ]
+              }
+            }
+          ]
         },
-        "url": {"raw": "http://localhost:8080/advertisements"}
-      },
-      "response": []
-    },
-    {
-      "name": "Search Advertisements",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/advertisements/search?carBrand=BMW&city=Kyiv",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["advertisements", "search"],
-          "query": [
-            {"key": "carBrand", "value": "BMW"},
-            {"key": "city", "value": "Kyiv"}
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"newuser@example.com\",\"password\":\"password123\"}"
+            },
+            "url": "http://localhost:8080/api/auth/register"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "pm.expect(pm.response.text()).to.include('Пользователь зарегистрирован');",
+                  "console.log('Registration successful');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User (Buyer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"newuser@example.com\",\"password\":\"password123\"}"
+            },
+            "url": "http://localhost:8080/api/auth/login"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var token = pm.response.text();",
+                  "pm.environment.set('buyer_jwt_token', token);",
+                  "console.log('Buyer JWT Token:', token);",
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@example.com\",\"password\":\"admin123\"}"
+            },
+            "url": "http://localhost:8080/api/auth/login"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var token = pm.response.text();",
+                  "pm.environment.set('admin_jwt_token', token);",
+                  "console.log('Admin JWT Token:', token);",
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "url": "http://localhost:8080/api/auth/me"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.environment.set('buyer_user_id', jsonResponse);",
+                  "console.log('Buyer User ID:', jsonResponse);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upgrade to Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "url": "http://localhost:8080/api/auth/upgrade?email=buyer@example.com"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "pm.expect(pm.response.text()).to.include('Account upgraded to premium');",
+                  "console.log('Upgrade successful');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Manager (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"manager@example.com\",\"password\":\"manager123\"}"
+            },
+            "url": "http://localhost:8080/api/auth/create-manager"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "pm.expect(pm.response.text()).to.include('Manager created successfully');",
+                  "console.log('Manager created');"
+                ]
+              }
+            }
           ]
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Edit Advertisement",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":35000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car description\"}"
+      "name": "Advertisements",
+      "item": [
+        {
+          "name": "Create Advertisement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":{{buyer_user_id}},\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":35000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Good car\"}"
+            },
+            "url": "http://localhost:8080/advertisements"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.expect(jsonResponse).to.be.an('object');",
+                  "pm.expect(jsonResponse.id).to.exist;",
+                  "pm.environment.set('ad_id_bmw_x5', jsonResponse.id);",
+                  "console.log('Created Advertisement ID:', jsonResponse.id);",
+                  "pm.expect(jsonResponse.carBrand).to.equal('BMW');",
+                  "pm.expect(jsonResponse.carModel).to.equal('X5');",
+                  "pm.expect(jsonResponse.price).to.equal(35000);"
+                ]
+              }
+            }
+          ]
         },
-        "url": {"raw": "http://localhost:8080/advertisements/1/edit"}
-      },
-      "response": []
-    },
-    {
-      "name": "Contact Seller",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"message\":\"Interested in your car, please contact me.\",\"contactInfo\":\"buyer@example.com\"}"
+        {
+          "name": "Edit Advertisement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":{{buyer_user_id}},\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":40000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car\"}"
+            },
+            "url": "http://localhost:8080/advertisements/{{ad_id_bmw_x5}}/edit"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.expect(jsonResponse).to.be.an('object');",
+                  "pm.expect(jsonResponse.id).to.exist;",
+                  "pm.expect(jsonResponse.carModel).to.equal('X6');",
+                  "pm.expect(jsonResponse.price).to.equal(40000);",
+                  "console.log('Advertisement updated:', jsonResponse.id);"
+                ]
+              }
+            }
+          ]
         },
-        "url": {"raw": "http://localhost:8080/advertisements/1/contact"}
-      },
-      "response": []
-    },
-    {
-      "name": "Get Advertisement Stats",
-      "request": {
-        "method": "GET",
-        "header": [{"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}],
-        "url": {"raw": "http://localhost:8080/advertisements/1/stats"}
-      },
-      "response": []
-    },
-    {
-      "name": "Report Missing Brand",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Content-Type", "value": "application/json"}],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"brand\":\"Tesla\",\"model\":\"Model Y\",\"message\":\"Please add this car to the list.\"}"
+        {
+          "name": "Search Advertisements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8080/advertisements/search?carBrand=BMW&carModel=X5&minPrice=30000&maxPrice=40000&city=Kyiv"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.expect(jsonResponse).to.be.an('object');",
+                  "pm.expect(jsonResponse.content).to.be.an('array');",
+                  "console.log('Search results:', jsonResponse.content.length, 'items');"
+                ]
+              }
+            }
+          ]
         },
-        "url": {"raw": "http://localhost:8080/api/cars/report-missing-brand"}
-      },
-      "response": []
-    },
-    {
-      "name": "Create Dealership (Admin only)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {"key": "Content-Type", "value": "application/json"},
-          {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
-        ],
-        "body": {"mode": "raw", "raw": "{\"name\":\"Test Dealership\",\"userIds\":[1]}"},
-        "url": {
-          "raw": "http://localhost:8080/dealerships?adminId=1",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["dealerships"],
-          "query": [{"key": "adminId", "value": "1"}]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Assign User to Dealership (Admin only)",
-      "request": {
-        "method": "POST",
-        "header": [{"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}],
-        "url": {
-          "raw": "http://localhost:8080/dealerships/1/assign-user?userId=1&role=SALES",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["dealerships", "1", "assign-user"],
-          "query": [
-            {"key": "userId", "value": "1"},
-            {"key": "role", "value": "SALES"}
+        {
+          "name": "Contact Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"message\":\"Interested in your car\",\"contactInfo\":\"phone:123456789\"}"
+            },
+            "url": "http://localhost:8080/advertisements/{{ad_id_bmw_x5}}/contact"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "console.log('Contact request sent');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Advertisement Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "url": "http://localhost:8080/advertisements/{{ad_id_bmw_x5}}/stats"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.expect(jsonResponse).to.be.an('object');",
+                  "console.log('Advertisement stats:', jsonResponse);"
+                ]
+              }
+            }
           ]
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "Premium & Payments",
+      "item": [
+        {
+          "name": "Purchase Premium",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{buyer_jwt_token}}"}
+            ],
+            "url": "http://localhost:8080/api/premium/purchase?email=buyer@example.com"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "pm.expect(pm.response.text()).to.include('User upgraded to premium successfully');",
+                  "console.log('Premium purchase successful');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dealerships",
+      "item": [
+        {
+          "name": "Create Dealership (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"AutoDeal\",\"address\":\"Kyiv\",\"userIds\":[{{buyer_user_id}}],\"adminId\":{{buyer_user_id}}}"
+            },
+            "url": "http://localhost:8080/dealerships"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "var jsonResponse = pm.response.json();",
+                  "pm.expect(jsonResponse).to.be.an('object');",
+                  "pm.environment.set('dealership_id', jsonResponse.id);",
+                  "console.log('Dealership created:', jsonResponse.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Assign User to Dealership (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
+            ],
+            "url": "http://localhost:8080/dealerships/{{dealership_id}}/assign-user?userId={{buyer_user_id}}&role=SELLER"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "pm.expect(pm.response.text()).to.include('User assigned to dealership');",
+                  "console.log('User assigned to dealership');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cars",
+      "item": [
+        {
+          "name": "Report Missing Car Brand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brand\":\"Unknown\",\"model\":\"UnknownModel\",\"description\":\"Missing car brand\"}"
+            },
+            "url": "http://localhost:8080/api/cars/report-missing-brand"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "pm.expect(pm.response.text()).to.include('Report submitted successfully');",
+                  "console.log('Report submitted');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
-    {"key": "buyer_jwt_token", "value": ""},
-    {"key": "admin_jwt_token", "value": ""}
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          ""
+        ]
+      }
+    }
   ]
 }

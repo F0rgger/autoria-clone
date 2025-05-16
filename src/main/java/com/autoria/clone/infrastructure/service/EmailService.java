@@ -41,7 +41,7 @@ public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     public void sendEmail(String to, String subject, String body) {
-        // Мокируем отправку email: вместо реальной отправки просто логируем информацию
+
         logger.info("Mocked email sent to: {}\nSubject: {}\nBody: {}", to, subject, body);
     }
 }

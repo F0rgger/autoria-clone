@@ -26,25 +26,22 @@ public class PaymentController {
     public ResponseEntity<String> purchasePremium(@RequestParam String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         if (user.isPremium()) {
             logger.warn("User {} is already a premium member", email);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("User is already a premium member");
         }
-
-        // Мокируем покупку: устанавливаем premium = true и добавляем роль SELLER
         user.setPremium(true);
         Role sellerRole = roleRepository.findByName(Role.SELLER)
                 .orElseGet(() -> {
                     Role newRole = new Role();
                     newRole.setName(Role.SELLER);
+
                     newRole.setPermissions(Arrays.asList("CREATE_ADVERTISEMENT", "EDIT_ADVERTISEMENT", "VIEW_ADVERTISEMENT_STATS"));
                     return roleRepository.save(newRole);
                 });
         user.getRoles().add(sellerRole);
         userRepository.save(user);
-
         logger.info("User {} upgraded to premium (mocked)", email);
         return ResponseEntity.ok("User upgraded to premium successfully (mocked)");
     }

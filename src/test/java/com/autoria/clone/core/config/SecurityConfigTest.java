@@ -38,7 +38,6 @@ public class SecurityConfigTest {
 
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
 
-        // Здесь можно добавить дополнительную логику для проверки фильтров
-        // Например, запуск MockMvc с запросом и проверка авторизации
+
     }
 }

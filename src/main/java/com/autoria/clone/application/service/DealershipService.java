@@ -22,7 +22,7 @@ public class DealershipService {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (dealership.getUsers() == null) {
-            dealership.setUsers(new ArrayList<>()); // Безопасная инициализация
+            dealership.setUsers(new ArrayList<>());
         }
         dealership.getUsers().add(admin);
         dealership.getUserRoles().put(admin.getId(), "ADMIN");
@@ -36,7 +36,7 @@ public class DealershipService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (dealership.getUsers() == null) {
-            dealership.setUsers(new ArrayList<>()); // Безопасная инициализация
+            dealership.setUsers(new ArrayList<>());
         }
         dealership.getUsers().add(user);
         dealership.getUserRoles().put(userId, role);

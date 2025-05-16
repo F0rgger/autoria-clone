@@ -24,7 +24,7 @@ public class JwtSecretValidator {
             if (decodedKey.length < 64) {
                 throw new IllegalStateException("JWT secret key is too short for HS512. Required: >=512 bits (64 bytes), got: " + (decodedKey.length * 8) + " bits");
             }
-            Keys.hmacShaKeyFor(decodedKey); // Проверка совместимости с HS512
+            Keys.hmacShaKeyFor(decodedKey);
             logger.info("JWT secret is valid, length: {} bytes", decodedKey.length);
         } catch (IllegalArgumentException e) {
             logger.error("Invalid JWT secret: {}", e.getMessage());

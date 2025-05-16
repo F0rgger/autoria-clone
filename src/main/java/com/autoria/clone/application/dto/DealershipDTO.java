@@ -7,6 +7,7 @@ import java.util.Map;
 
 @Data
 public class DealershipDTO {
+    private Long adminId;
     private Long id;
     private String name;
     private String address;

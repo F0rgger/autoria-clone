@@ -42,8 +42,9 @@ public class SecurityConfig {
                         .requestMatchers("/advertisements").hasAuthority("CREATE_ADVERTISEMENT")
                         .requestMatchers("/advertisements/*/edit").hasAuthority("EDIT_ADVERTISEMENT")
                         .requestMatchers("/advertisements/*/stats").hasAuthority("VIEW_ADVERTISEMENT_STATS")
+                        .requestMatchers("/advertisements/*/contact").permitAll()
                         .requestMatchers("/dealerships/**").hasRole("ADMIN")
-                        .requestMatchers("/api/cars/report-missing-brand").permitAll() // Добавлено
+                        .requestMatchers("/api/cars/report-missing-brand").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -54,7 +55,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
                 .map(user -> {
-                    // Инициализация ролей и разрешений внутри транзакции
+
                     user.getRoles().forEach(role -> role.getPermissions().size());
                     var authorities = user.getRoles().stream()
                             .flatMap(role -> {

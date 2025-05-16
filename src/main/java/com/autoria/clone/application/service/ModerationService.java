@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Сервіс для модерації оголошень.
- */
+
 @Service
 @RequiredArgsConstructor
 public class ModerationService {
@@ -23,12 +21,7 @@ public class ModerationService {
     private final ProfanityFilterService profanityFilterService;
     private final EmailService emailService;
 
-    /**
-     * Перевіряє оголошення на нецензурну лексику.
-     *
-     * @param advertisementId ID оголошення
-     * @return true, якщо оголошення пройшло перевірку; false, якщо містить нецензурну лексику
-     */
+
     @Transactional
     public boolean checkAdvertisement(Long advertisementId) {
         logger.debug("Checking advertisement with ID: {}", advertisementId);
@@ -67,11 +60,7 @@ public class ModerationService {
         return false;
     }
 
-    /**
-     * Надсилає повідомлення менеджеру про оголошення, яке не пройшло перевірку.
-     *
-     * @param advertisement Оголошення
-     */
+
     private void notifyManager(Advertisement advertisement) {
         String subject = "Оголошення потребує перевірки";
         String body = String.format(

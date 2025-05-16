@@ -17,7 +17,7 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ElementCollection(fetch = FetchType.EAGER) // Изменяем на EAGER
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))
     @Column(name = "permission")
     private List<String> permissions;

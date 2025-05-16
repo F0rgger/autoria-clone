@@ -14,11 +14,11 @@ public class GoogleCloudConfig {
 
     @Bean
     public LanguageServiceClient languageServiceClient() throws IOException {
-        // Укажите путь к вашему JSON-файлу учетных данных
-        String credentialsPath = "C:\\Users\\maxfo\\google-credentials.json";
+
+        String credentialsPath = "C:\\Users\\maxfo\\IdeaProjects\\autoria-clone\\google-credentials.json";
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialsPath));
 
-        // Явно задаём endpoint
+
         String endpoint = "language.googleapis.com:443";
         LanguageServiceSettings settings = LanguageServiceSettings.newBuilder()
                 .setCredentialsProvider(() -> credentials)

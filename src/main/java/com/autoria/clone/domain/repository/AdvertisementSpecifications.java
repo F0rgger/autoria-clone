@@ -20,17 +20,17 @@ public class AdvertisementSpecifications {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Фильтр по carBrand
+
             if (carBrand != null) {
                 predicates.add(criteriaBuilder.equal(root.get("carBrand"), carBrand));
             }
 
-            // Фильтр по carModel
+
             if (carModel != null) {
                 predicates.add(criteriaBuilder.equal(root.get("carModel"), carModel));
             }
 
-            // Фильтр по цене (minPrice и maxPrice)
+
             if (minPrice != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
             }
@@ -38,22 +38,21 @@ public class AdvertisementSpecifications {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
             }
 
-            // Фильтр по городу
+
             if (city != null && !city.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("city"), city));
             }
 
-            // Фильтр по региону
+
             if (region != null && !region.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("region"), region));
             }
 
-            // Фильтр по валюте (если нужно фильтровать по convertedPrices)
+
             if (currency != null && !currency.isEmpty()) {
                 predicates.add(criteriaBuilder.isNotNull(root.get("convertedPrices").get(currency)));
             }
 
-            // Добавляем условие, чтобы показывать только активные объявления
             predicates.add(criteriaBuilder.equal(root.get("status"), "ACTIVE"));
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

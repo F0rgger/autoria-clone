@@ -30,7 +30,7 @@ public class ProfanityFilterService {
             Sentiment sentiment = languageClient.analyzeSentiment(document).getDocumentSentiment();
             float score = sentiment.getScore();
 
-            // Если оценка тональности сильно отрицательная (например, < -0.5), считаем текст нецензурным
+
             boolean containsProfanity = score < -0.5;
             logger.debug("Оценка тональности: {}, содержит нецензурную лексику: {}", score, containsProfanity);
 
