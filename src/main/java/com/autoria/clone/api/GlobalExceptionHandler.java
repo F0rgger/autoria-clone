@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
-        logger.error("Unexpected error: {}", ex.getMessage());
+        logger.error("Unexpected error", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Unexpected error: " + ex.getMessage());
     }

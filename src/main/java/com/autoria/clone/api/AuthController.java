@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -170,23 +171,23 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Role sellerRole = roleRepository.findByName(Role.SELLER)
                 .map(role -> {
-                    role.setPermissions(Arrays.asList(
+                    role.setPermissions(new ArrayList<>(Arrays.asList(
                             "CREATE_ADVERTISEMENT",
                             "EDIT_ADVERTISEMENT",
                             "DELETE_ADVERTISEMENT",
                             "VIEW_ADVERTISEMENT_STATS"
-                    ));
+                    )));
                     return roleRepository.save(role);
                 })
                 .orElseGet(() -> {
                     Role newRole = new Role();
                     newRole.setName(Role.SELLER);
-                    newRole.setPermissions(Arrays.asList(
+                    newRole.setPermissions(new ArrayList<>(Arrays.asList(
                             "CREATE_ADVERTISEMENT",
                             "EDIT_ADVERTISEMENT",
                             "DELETE_ADVERTISEMENT",
                             "VIEW_ADVERTISEMENT_STATS"
-                    ));
+                    )));
                     return roleRepository.save(newRole);
                 });
         if (!user.getRoles().contains(sellerRole)) {
