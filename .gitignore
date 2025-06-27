@@ -2,7 +2,7 @@
 *
 
 !src/
-!autoria.postman_collection1.json
+!autoria.postman_collection.json
 !application.yml
 !docker-compose.yml
 !Dockerfile

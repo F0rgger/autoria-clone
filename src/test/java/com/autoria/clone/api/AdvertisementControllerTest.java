@@ -139,11 +139,25 @@ public class AdvertisementControllerTest {
     @WithMockUser(authorities = "EDIT_ADVERTISEMENT")
     public void testEditAdvertisementSuccess() throws Exception {
         when(advertisementService.updateAdvertisement(1L, any(Advertisement.class))).thenReturn(advertisement);
-
-        mockMvc.perform(post("/advertisements/1/edit")
+        mockMvc.perform(put("/advertisements/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":35000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value("Updated car"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "EDIT_ADVERTISEMENT")
+    public void testDeleteAdvertisementSuccess() throws Exception {
+        mockMvc.perform(delete("/advertisements/1?userId=1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(authorities = "EDIT_ADVERTISEMENT")
+    public void testDeleteAdvertisementForbidden() throws Exception {
+        doThrow(new SecurityException("User is not the owner of the advertisement")).when(advertisementService).deleteAdvertisement(1L, 2L);
+        mockMvc.perform(delete("/advertisements/1?userId=2"))
+                .andExpect(status().isForbidden());
     }
 }

@@ -10,13 +10,6 @@
     <description>AutoRia Clone platform</description>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>spring-cloud-gcp-dependencies</artifactId>
-                <version>${spring-cloud-gcp.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -29,7 +22,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring-cloud-gcp.version>4.7.2</spring-cloud-gcp.version>
     </properties>
 
     <dependencies>
@@ -138,13 +130,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Google Cloud NLP -->
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-language</artifactId>
-            <version>2.53.0</version>
-        </dependency>
-
         <!-- Caffeine Cache -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -209,20 +194,16 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>spring-cloud-gcp-starter</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>gcloud</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <repositories>
-    <repository>
-        <id>central</id>
-        <url>https://repo.maven.apache.org/maven2</url>
-    </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
     </repositories>
 
     <build>

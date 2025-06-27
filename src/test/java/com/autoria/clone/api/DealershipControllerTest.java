@@ -44,6 +44,7 @@ public class DealershipControllerTest {
         DealershipDTO dealershipDTO = new DealershipDTO();
         dealershipDTO.setName("AutoSalon");
         dealershipDTO.setUserIds(Collections.singletonList(1L));
+        dealershipDTO.setAdminId(1L);
 
         Dealership dealership = new Dealership();
         User user = new User();
@@ -55,8 +56,12 @@ public class DealershipControllerTest {
 
         mockMvc.perform(post("/dealerships")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"AutoSalon\",\"address\":\"Kyiv\",\"userIds\":[1]}")
-                        .param("adminId", "1"))
+                        .content("{\"name\":\"AutoSalon\",\"address\":\"Kyiv\",\"userIds\":[1],\"adminId\":1}"))
                 .andExpect(status().isOk());
     }
-}
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testAssignUserToDealership() throws Exception {
+        mockMvc.perform(post("/dealerships/1/assign-user?userId=1&role=SELLER"))
+    }

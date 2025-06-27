@@ -24,6 +24,9 @@ public class PaymentController {
 
     @PostMapping("/purchase")
     public ResponseEntity<String> purchasePremium(@RequestParam String email) {
+        if (email == null || !email.contains("@")) {
+            return ResponseEntity.badRequest().body("Invalid email");
+        }
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (user.isPremium()) {
@@ -36,7 +39,6 @@ public class PaymentController {
                 .orElseGet(() -> {
                     Role newRole = new Role();
                     newRole.setName(Role.SELLER);
-
                     newRole.setPermissions(Arrays.asList("CREATE_ADVERTISEMENT", "EDIT_ADVERTISEMENT", "VIEW_ADVERTISEMENT_STATS"));
                     return roleRepository.save(newRole);
                 });

@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -73,4 +74,7 @@ public class Advertisement {
     @ManyToOne
     @JoinColumn(name = "dealership_id")
     private Dealership dealership;
+
+    @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ViewLog> viewLogs;
 }

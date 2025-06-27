@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,12 +43,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleProfanityException(ProfanityException ex) {
         logger.warn("Profanity detected: {}", ex.getMessage());
-        if (ex.getMessage().contains("Your default credentials were not found")) {
-            return ResponseEntity.badRequest()
-                    .body("Учетные данные Google Cloud NLP API не найдены. Пожалуйста, настройте Application Default Credentials по адресу https://cloud.google.com/docs/authentication/external/set-up-adc.");
-        }
         return ResponseEntity.badRequest()
                 .body("Profanity detected, please edit your advertisement: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+        String msg = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .reduce((a, b) -> a + "; " + b)
+                .orElse("Validation error");
+        logger.warn("Validation failed: {}", msg);
+        return ResponseEntity.badRequest().body("Validation error: " + msg);
     }
 
     @ExceptionHandler(Exception.class)

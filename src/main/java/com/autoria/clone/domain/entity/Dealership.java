@@ -27,7 +27,7 @@ public class Dealership {
             name = "dealership_users",
             joinColumns = @JoinColumn(name = "dealership_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users = new ArrayList<>(); // Добавлена инициализация
+    private List<User> users = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "dealership_roles", joinColumns = @JoinColumn(name = "dealership_id"))

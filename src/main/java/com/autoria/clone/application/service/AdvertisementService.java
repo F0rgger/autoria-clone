@@ -154,8 +154,15 @@ public class AdvertisementService {
         return stats;
     }
 
-
-
+    public void deleteAdvertisement(Long id, Long userId) {
+        Advertisement ad = advertisementRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Advertisement not found: " + id));
+        if (!ad.getUser().getId().equals(userId)) {
+            // Можно добавить проверку на ADMIN, если нужно
+            throw new SecurityException("User is not the owner of the advertisement");
+        }
+        advertisementRepository.delete(ad);
+    }
 
     private Map<String, BigDecimal> calculateConvertedPrices(BigDecimal originalPrice, String originalCurrency, Map<String, BigDecimal> rates) {
         Map<String, BigDecimal> convertedPrices = new HashMap<>();

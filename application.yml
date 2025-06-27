@@ -1,39 +1,32 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/autoria_clone
-    username: postgres
-    password: mysecurepassword123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/autoria_clone}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:mysecurepassword123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: maxforger@gmail.com
-    password: tzdj knmx mhin pzex
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:maxforger@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:tzdj knmx mhin pzex}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}
           starttls:
-            enable: true
+            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}
   cache:
     cache-names: exchangeRates
     caffeine:
       spec: expireAfterWrite=24h
-  cloud:
-    gcp:
-      credentials:
-        location: file:C:\Users\maxfo\google-credentials.json
-        logging:
-          level:
-            com.google.cloud: DEBUG
-            org.springframework.cloud.gcp: DEBUG
 
 privatbank:
   api:
@@ -43,10 +36,12 @@ server:
   port: 8080
 
 jwt:
-  secret: 3zX9kPqW2mY8nR4vL6tJcF3hD5gB0aE2iU9oM7sN1rQ5yZ2xW8kPqV3mN7vL9tJcF4hD6gB1aE3iU0oM8sN2rQ==
-  expiration: 86400000
+  secret: ${JWT_SECRET:3zX9kPqW2mY8nR4vL6tJcF3hD5gB0aE2iU9oM7sN1rQ5yZ2xW8kPqV3mN7vL9tJcF4hD6gB1aE3iU0oM8sN2rQ==}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 logging:
   level:
     org.springframework.security: DEBUG
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
     com.autoria.clone: DEBUG

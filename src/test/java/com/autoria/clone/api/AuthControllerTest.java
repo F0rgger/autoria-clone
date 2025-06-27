@@ -96,4 +96,71 @@ public class AuthControllerTest {
 
         assert user.getAdvertisementCount() == 0;
     }
+
+    @Test
+    public void testLoginSuccess() throws Exception {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setPassword("encodedPassword");
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
+        when(entityMapper.toUserEntity(any(UserDTO.class))).thenReturn(user);
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"user@example.com\",\"password\":\"password\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testLoginInvalidPassword() throws Exception {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setPassword("encodedPassword");
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong", "encodedPassword")).thenReturn(false);
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"user@example.com\",\"password\":\"wrong\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testUpgradeAccount() throws Exception {
+        User user = new User();
+        user.setEmail("user@example.com");
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(roleRepository.findByName("SELLER")).thenReturn(Optional.of(new Role()));
+        mockMvc.perform(post("/api/auth/upgrade?email=user@example.com"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testCreateManager() throws Exception {
+        when(userRepository.findByEmail("manager@example.com")).thenReturn(Optional.empty());
+        when(roleRepository.findByName("MANAGER")).thenReturn(Optional.of(new Role()));
+        mockMvc.perform(post("/api/auth/create-manager")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"manager@example.com\",\"password\":\"manager123\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetCurrentUser() throws Exception {
+        User user = new User();
+        user.setEmail("user@example.com");
+        user.setId(1L);
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        mockMvc.perform(post("/api/auth/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"user@example.com\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testRegisterInvalidEmail() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"\",\"password\":\"password\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }

@@ -26,7 +26,10 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -53,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> register(@Valid @RequestBody UserDTO userDTO) {
         logger.info("Received registration request for email: {}", userDTO.getEmail());
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             logger.warn("User with email {} already exists", userDTO.getEmail());
@@ -71,7 +74,13 @@ public class AuthController {
                     .orElseGet(() -> {
                         Role newRole = new Role();
                         newRole.setName(Role.ADMIN);
-                        newRole.setPermissions(Arrays.asList("MANAGE_ROLES", "MODERATE_ADVERTISEMENT"));
+                        newRole.setPermissions(Arrays.asList(
+                                "MANAGE_ROLES",
+                                "MODERATE_ADVERTISEMENT",
+                                "EDIT_ADVERTISEMENT",
+                                "CREATE_ADVERTISEMENT",
+                                "VIEW_ADVERTISEMENT_STATS"
+                        ));
                         return roleRepository.save(newRole);
                     });
         } else {
@@ -90,10 +99,8 @@ public class AuthController {
         return ResponseEntity.ok("Пользователь зарегистрирован");
     }
 
-
-
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO loginUserDTO) {
+    public ResponseEntity<String> login(@Valid @RequestBody UserDTO loginUserDTO) {
         logger.info("Received login request for email: {}", loginUserDTO.getEmail());
         User user = userRepository.findByEmail(loginUserDTO.getEmail())
                 .orElseThrow(() -> {
@@ -118,13 +125,13 @@ public class AuthController {
 
     @PostMapping("/create-manager")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> createManager(@RequestBody UserDTO userDTO) {
-        // Проверяем, существует ли пользователь с таким email
+    public ResponseEntity<String> createManager(@Valid @RequestBody UserDTO userDTO) {
+
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("User with email " + userDTO.getEmail() + " already exists");
         }
 
-        // Создаём роль MANAGER, если её нет
+
         Role managerRole = roleRepository.findByName(Role.MANAGER)
                 .orElseGet(() -> {
                     Role newManagerRole = new Role();
@@ -145,7 +152,7 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching current user: {}", userDetails.getUsername());
         if (userDetails == null) {
             logger.error("UserDetails is null");
@@ -153,7 +160,7 @@ public class AuthController {
         }
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userDetails.getUsername()));
-        return ResponseEntity.ok(String.valueOf(user.getId()));
+        return ResponseEntity.ok(Map.of("id", user.getId(), "email", user.getEmail()));
     }
 
     @PostMapping("/upgrade")
@@ -162,11 +169,24 @@ public class AuthController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Role sellerRole = roleRepository.findByName(Role.SELLER)
+                .map(role -> {
+                    role.setPermissions(Arrays.asList(
+                            "CREATE_ADVERTISEMENT",
+                            "EDIT_ADVERTISEMENT",
+                            "DELETE_ADVERTISEMENT",
+                            "VIEW_ADVERTISEMENT_STATS"
+                    ));
+                    return roleRepository.save(role);
+                })
                 .orElseGet(() -> {
                     Role newRole = new Role();
                     newRole.setName(Role.SELLER);
-                    // Обновляем разрешения
-                    newRole.setPermissions(Arrays.asList("CREATE_ADVERTISEMENT", "EDIT_ADVERTISEMENT", "VIEW_ADVERTISEMENT_STATS"));
+                    newRole.setPermissions(Arrays.asList(
+                            "CREATE_ADVERTISEMENT",
+                            "EDIT_ADVERTISEMENT",
+                            "DELETE_ADVERTISEMENT",
+                            "VIEW_ADVERTISEMENT_STATS"
+                    ));
                     return roleRepository.save(newRole);
                 });
         user.getRoles().add(sellerRole);

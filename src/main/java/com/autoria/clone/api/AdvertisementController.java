@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +66,7 @@ public class AdvertisementController {
         return ResponseEntity.ok(entityMapper.toAdvertisementDTO(created));
     }
 
-    @PostMapping("/{id}/edit")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('EDIT_ADVERTISEMENT')")
     public ResponseEntity<AdvertisementDTO> editAdvertisement(@PathVariable Long id, @Valid @RequestBody AdvertisementDTO advertisementDTO) {
         if (advertisementDTO.getUserId() == null) {
@@ -141,5 +142,14 @@ public class AdvertisementController {
         com.autoria.clone.domain.entity.User user = advertisementService.loadUserEntity(userDetails.getUsername());
         Map<String, Object> stats = advertisementService.getAdvertisementStats(id, user);
         return ResponseEntity.ok(stats);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_ADVERTISEMENT') or hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteAdvertisement(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userDetails.getUsername()));
+        advertisementService.deleteAdvertisement(id, user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

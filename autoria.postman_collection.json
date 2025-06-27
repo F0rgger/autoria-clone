@@ -1,0 +1,335 @@
+{
+  "info": {
+    "name": "Autoria Clone API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Полная коллекция для Autoria Clone. Все эндпоинты соответствуют коду. Импортируй в Postman и пользуйся.\n\nКоллекция полностью автоматизирована: все токены и сценарии работают без ручных правок."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"user@example.com\",\"password\":\"password123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"user@example.com\",\"password\":\"password123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set('jwt_token', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@example.com\",\"password\":\"admin123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@example.com\",\"password\":\"admin123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set('admin_jwt_token', pm.response.text());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('ID пользователя: ' + pm.response.text(), function () {",
+                  "    console.log('ID пользователя: ' + pm.response.text());",
+                  "    pm.expect(pm.response.text()).to.match(/^[0-9]+$/);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upgrade to Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/api/auth/upgrade?email=user@example.com"
+          }
+        },
+        {
+          "name": "Create Manager (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"manager@example.com\",\"password\":\"manager123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/create-manager"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Advertisements",
+      "item": [
+        {
+          "name": "Create Advertisement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"X5\",\"price\":35000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Good car\"}"
+            },
+            "url": "{{baseUrl}}/advertisements"
+          }
+        },
+        {
+          "name": "Edit Advertisement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"X6\",\"price\":40000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car\"}"
+            },
+            "url": "{{baseUrl}}/advertisements/1"
+          }
+        },
+        {
+          "name": "Search Advertisements",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/advertisements/search?carBrand=BMW&carModel=X5&minPrice=30000&maxPrice=40000&city=Kyiv"
+          }
+        },
+        {
+          "name": "Contact Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"message\":\"Interested in your car\",\"contactInfo\":\"phone:123456789\"}"
+            },
+            "url": "{{baseUrl}}/advertisements/1/contact"
+          }
+        },
+        {
+          "name": "Get Advertisement Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/advertisements/1/stats"
+          }
+        },
+        {
+          "name": "Delete Advertisement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/advertisements/1?userId=1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dealerships",
+      "item": [
+        {
+          "name": "Create Dealership (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"AutoDeal\",\"address\":\"Kyiv\",\"userIds\":[1],\"adminId\":1}"
+            },
+            "url": "{{baseUrl}}/dealerships"
+          }
+        },
+        {
+          "name": "Assign User to Dealership (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{admin_jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/dealerships/1/assign-user?userId=1&role=SELLER"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cars",
+      "item": [
+        {
+          "name": "Report Missing Car Brand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brand\":\"Unknown\",\"model\":\"UnknownModel\",\"description\":\"Missing car brand\"}"
+            },
+            "url": "{{baseUrl}}/api/cars/report-missing-brand"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Premium",
+      "item": [
+        {
+          "name": "Purchase Premium",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
+            ],
+            "url": "{{baseUrl}}/api/premium/purchase?email=user@example.com"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "admin_email", "value": "admin@example.com"},
+    {"key": "admin_password", "value": "admin123"},
+    {"key": "user_email", "value": "user@example.com"},
+    {"key": "user_password", "value": "password123"}
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Автоматически регистрируем и логиним админа, если нет токена",
+          "if (!pm.environment.get('admin_jwt_token')) {",
+          "    pm.sendRequest({",
+          "        url: pm.variables.replaceIn('{{baseUrl}}/api/auth/register'),",
+          "        method: 'POST',",
+          "        header: { 'Content-Type': 'application/json' },",
+          "        body: { mode: 'raw', raw: JSON.stringify({ email: pm.variables.get('admin_email'), password: pm.variables.get('admin_password') }) }",
+          "    }, function (err, res) {",
+          "        // ignore errors (user may already exist)",
+          "        pm.sendRequest({",
+          "            url: pm.variables.replaceIn('{{baseUrl}}/api/auth/login'),",
+          "            method: 'POST',",
+          "            header: { 'Content-Type': 'application/json' },",
+          "            body: { mode: 'raw', raw: JSON.stringify({ email: pm.variables.get('admin_email'), password: pm.variables.get('admin_password') }) }",
+          "        }, function (err2, res2) {",
+          "            if (!err2 && res2.code === 200) {",
+          "                pm.environment.set('admin_jwt_token', res2.text());",
+          "            }",
+          "        });",
+          "    });",
+          "}",
+          "// То же самое для обычного пользователя",
+          "if (!pm.environment.get('jwt_token')) {",
+          "    pm.sendRequest({",
+          "        url: pm.variables.replaceIn('{{baseUrl}}/api/auth/register'),",
+          "        method: 'POST',",
+          "        header: { 'Content-Type': 'application/json' },",
+          "        body: { mode: 'raw', raw: JSON.stringify({ email: pm.variables.get('user_email'), password: pm.variables.get('user_password') }) }",
+          "    }, function (err, res) {",
+          "        pm.sendRequest({",
+          "            url: pm.variables.replaceIn('{{baseUrl}}/api/auth/login'),",
+          "            method: 'POST',",
+          "            header: { 'Content-Type': 'application/json' },",
+          "            body: { mode: 'raw', raw: JSON.stringify({ email: pm.variables.get('user_email'), password: pm.variables.get('user_password') }) }",
+          "        }, function (err2, res2) {",
+          "            if (!err2 && res2.code === 200) {",
+          "                pm.environment.set('jwt_token', res2.text());",
+          "            }",
+          "        });",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}
