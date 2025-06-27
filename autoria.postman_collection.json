@@ -204,7 +204,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"X6\",\"price\":40000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car\"}"
+              "raw": "{\"userId\":1,\"carBrand\":\"BMW\",\"carModel\":\"M3\",\"price\":40000,\"originalCurrency\":\"USD\",\"city\":\"Kyiv\",\"region\":\"Kyiv\",\"description\":\"Updated car\"}"
             },
             "url": "{{baseUrl}}/advertisements/1"
           }
