@@ -189,7 +189,9 @@ public class AuthController {
                     ));
                     return roleRepository.save(newRole);
                 });
-        user.getRoles().add(sellerRole);
+        if (!user.getRoles().contains(sellerRole)) {
+            user.getRoles().add(sellerRole);
+        }
         user.setPremium(true);
         userRepository.save(user);
         return ResponseEntity.ok("Account upgraded to premium");
